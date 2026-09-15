@@ -952,3 +952,21 @@ document.addEventListener("DOMContentLoaded", () => {
   updateHeader();
 
 });
+
+/* =========================
+   IMAGE FALLBACKS
+   ========================= */
+
+document.querySelectorAll('.project-img').forEach((img) => {
+  img.addEventListener('error', () => {
+    img.style.display = 'none';
+
+    const fallback = img
+      .closest('.project-media')
+      ?.querySelector('.media-fallback');
+
+    if (fallback) {
+      fallback.hidden = false;
+    }
+  });
+});
