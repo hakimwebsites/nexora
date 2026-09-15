@@ -1,813 +1,150 @@
-/**
- * Nexora
- * Pure Vanilla JavaScript
- *
- * Handles:
- * - Dynamic year
- * - Mobile navigation
- * - Smooth navigation
- * - Active navigation state
- * - FAQ accordion
- * - Form validation
- * - Formspree AJAX submission
- * - WhatsApp links
- * - Scroll reveal animations
- */
-
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* =========================================================
-     CONFIGURATION
-  ========================================================= */
+  /*
+   * NEXORA CONFIGURATION
+   * Change these values here if your contact details ever change.
+   */
 
-  const NEXORA_CONFIG = {
+  const CONFIG = {
     whatsappNumber: "971558311047",
 
     whatsappMessage:
       "Hi Nexora, I'd like to discuss a website project for my business.",
 
-    formEndpoint:
-      "https://formspree.io/f/meaqbely"
+    email: "hakimwebsites.ug@gmail.com"
   };
 
 
-  /* =========================================================
-     CURRENT YEAR
-  ========================================================= */
-
-  const yearElement = document.getElementById("current-year");
-
-  if (yearElement) {
-    yearElement.textContent = new Date().getFullYear();
-  }
-
-
-  /* =========================================================
-     MOBILE MENU
-  ========================================================= */
-
-  const mobileToggle = document.getElementById("mobileToggle");
-  const mobileMenu = document.getElementById("mobileMenu");
-
-  const mobileLinks = document.querySelectorAll(
-    ".mobile-link, .mobile-cta-btn"
-  );
-
-
-  function openMenu() {
-
-    if (!mobileToggle || !mobileMenu) {
-      return;
-    }
-
-    mobileToggle.classList.add("active");
-
-    mobileToggle.setAttribute(
-      "aria-expanded",
-      "true"
-    );
-
-    mobileMenu.classList.add("open");
-
-    mobileMenu.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-    document.body.style.overflow = "hidden";
-  }
-
-
-  function closeMenu() {
-
-    if (!mobileToggle || !mobileMenu) {
-      return;
-    }
-
-    mobileToggle.classList.remove("active");
-
-    mobileToggle.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-    mobileMenu.classList.remove("open");
-
-    mobileMenu.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-    document.body.style.overflow = "";
-  }
-
-
-  if (mobileToggle && mobileMenu) {
-
-    mobileToggle.addEventListener("click", () => {
-
-      const isExpanded =
-        mobileToggle.getAttribute("aria-expanded") === "true";
-
-      if (isExpanded) {
-        closeMenu();
-      } else {
-        openMenu();
-      }
-
-    });
-
-
-    mobileLinks.forEach((link) => {
-
-      link.addEventListener("click", () => {
-        closeMenu();
-      });
-
-    });
-
-
-    document.addEventListener("keydown", (event) => {
-
-      if (
-        event.key === "Escape" &&
-        mobileMenu.classList.contains("open")
-      ) {
-
-        closeMenu();
-
-        mobileToggle.focus();
-      }
-
-    });
-
-  }
-
-
-  /* =========================================================
-     CLOSE MOBILE MENU WHEN RESIZING
-  ========================================================= */
-
-  window.addEventListener("resize", () => {
-
-    if (
-      window.innerWidth > 768 &&
-      mobileMenu &&
-      mobileMenu.classList.contains("open")
-    ) {
-
-      closeMenu();
-
-    }
-
-  });
-
-
-  /* =========================================================
-     SMOOTH ANCHOR SCROLL
-  ========================================================= */
-
-  const anchorLinks = document.querySelectorAll(
-    'a[href^="#"]:not([href="#"])'
-  );
-
-  anchorLinks.forEach((link) => {
-
-    link.addEventListener("click", (event) => {
-
-      const targetId = link.getAttribute("href");
-
-      if (!targetId) {
-        return;
-      }
-
-      const target = document.querySelector(targetId);
-
-      if (!target) {
-        return;
-      }
-
-      event.preventDefault();
-
-      target.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-
-    });
-
-  });
-
-
-  /* =========================================================
-     ACTIVE NAVIGATION
-  ========================================================= */
-
-  const sections = document.querySelectorAll(
-    "main section[id]"
-  );
-
-  const navLinks = document.querySelectorAll(
-    ".nav-link"
-  );
-
-
-  if (sections.length && navLinks.length) {
-
-    const navObserver = new IntersectionObserver(
-      (entries) => {
-
-        entries.forEach((entry) => {
-
-          if (!entry.isIntersecting) {
-            return;
-          }
-
-          const currentId = entry.target.id;
-
-          navLinks.forEach((link) => {
-
-            const href = link.getAttribute("href");
-
-            link.classList.toggle(
-              "active",
-              href === `#${currentId}`
-            );
-
-          });
-
-        });
-
-      },
-      {
-        rootMargin: "-35% 0px -55% 0px",
-        threshold: 0
-      }
-    );
-
-
-    sections.forEach((section) => {
-      navObserver.observe(section);
-    });
-
-  }
-
-
-  /* =========================================================
-     FAQ ACCORDION
-  ========================================================= */
-
-  const faqQuestions =
-    document.querySelectorAll(".faq-question");
-
-
-  faqQuestions.forEach((question) => {
-
-    question.addEventListener("click", () => {
-
-      const item = question.closest(".faq-item");
-
-      if (!item) {
-        return;
-      }
-
-      const isOpen =
-        item.classList.contains("open");
-
-
-      /*
-       * Close other FAQ items
-       */
-      document
-        .querySelectorAll(".faq-item.open")
-        .forEach((openItem) => {
-
-          if (openItem !== item) {
-
-            openItem.classList.remove("open");
-
-            const openQuestion =
-              openItem.querySelector(".faq-question");
-
-            if (openQuestion) {
-
-              openQuestion.setAttribute(
-                "aria-expanded",
-                "false"
-              );
-
-            }
-
-          }
-
-        });
-
-
-      /*
-       * Toggle current item
-       */
-      item.classList.toggle(
-        "open",
-        !isOpen
-      );
-
-      question.setAttribute(
-        "aria-expanded",
-        String(!isOpen)
-      );
-
-    });
-
-  });
-
-
-  /* =========================================================
-     WHATSAPP LINKS
-  ========================================================= */
-
-  const whatsappLinks =
-    document.querySelectorAll(
-      'a[href*="wa.me"]'
-    );
-
+  /* =========================
+     CONTACT URLS
+  ========================== */
 
   const whatsappUrl =
-    `https://wa.me/${NEXORA_CONFIG.whatsappNumber}?text=${encodeURIComponent(
-      NEXORA_CONFIG.whatsappMessage
+    `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(
+      CONFIG.whatsappMessage
     )}`;
 
 
-  whatsappLinks.forEach((link) => {
-
-    link.setAttribute(
-      "href",
-      whatsappUrl
-    );
-
+  document.querySelectorAll(
+    'a[href^="https://wa.me/"]'
+  ).forEach((link) => {
+    link.href = whatsappUrl;
   });
 
 
-  /* =========================================================
-     FORM ELEMENTS
-  ========================================================= */
-
-  const contactForm =
-    document.getElementById("contactForm");
-
-  const submitBtn =
-    document.getElementById("submitBtn");
-
-  const formSuccess =
-    document.getElementById("formSuccess");
-
-  const formError =
-    document.getElementById("formError");
-
-
-  const fullName =
-    document.getElementById("fullName");
-
-  const businessName =
-    document.getElementById("businessName");
-
-  const email =
-    document.getElementById("email");
-
-  const phone =
-    document.getElementById("phone");
-
-  const businessType =
-    document.getElementById("businessType");
-
-  const service =
-    document.getElementById("service");
-
-  const message =
-    document.getElementById("message");
-
-
-  /* =========================================================
-     EMAIL VALIDATION
-  ========================================================= */
-
-  function validateEmail(value) {
-
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-      value
-    );
-
-  }
-
-
-  /* =========================================================
-     FIELD VALIDATION
-  ========================================================= */
-
-  function checkField(input, condition) {
-
-    if (!input) {
-      return true;
-    }
-
-    const group =
-      input.closest(".form-group");
-
-
-    if (!group) {
-      return condition;
-    }
-
-
-    if (!condition) {
-
-      group.classList.add("has-error");
-
-      return false;
-
-    }
-
-
-    group.classList.remove("has-error");
-
-    return true;
-
-  }
-
-
-  function clearFieldError(input) {
-
-    if (!input) {
-      return;
-    }
-
-    const group =
-      input.closest(".form-group");
-
-    if (group) {
-      group.classList.remove("has-error");
-    }
-
-  }
-
-
-  /*
-   * Clear errors as the user edits fields
-   */
-
-  [
-    fullName,
-    businessName,
-    email,
-    phone,
-    businessType,
-    service,
-    message
-  ].forEach((field) => {
-
-    if (!field) {
-      return;
-    }
-
-    field.addEventListener("input", () => {
-      clearFieldError(field);
-    });
-
-    field.addEventListener("change", () => {
-      clearFieldError(field);
-    });
-
+  document.querySelectorAll(
+    'a[href^="mailto:"]'
+  ).forEach((link) => {
+    link.href = `mailto:${CONFIG.email}`;
   });
 
 
-  /* =========================================================
-     FORM SUBMISSION
-  ========================================================= */
+  /* =========================
+     HEADER SCROLL EFFECT
+  ========================== */
 
-  if (contactForm) {
+  const header = document.getElementById("header");
 
-    contactForm.addEventListener(
-      "submit",
-      async (event) => {
 
-        event.preventDefault();
+  const handleHeaderScroll = () => {
+    if (!header) return;
 
+    if (window.scrollY > 30) {
+      header.classList.add("scrolled");
+    } else {
+      header.classList.remove("scrolled");
+    }
+  };
 
-        /*
-         * Hide previous messages
-         */
 
-        if (formSuccess) {
-          formSuccess.hidden = true;
-        }
+  handleHeaderScroll();
 
-        if (formError) {
-          formError.hidden = true;
-        }
+  window.addEventListener(
+    "scroll",
+    handleHeaderScroll,
+    { passive: true }
+  );
 
 
-        /*
-         * Honeypot protection
-         */
+  /* =========================
+     MOBILE NAVIGATION
+  ========================== */
 
-        const honeypot =
-          document.getElementById(
-            "company_website"
-          );
+  const mobileToggle =
+    document.getElementById("mobileToggle");
 
+  const mobileMenu =
+    document.getElementById("mobileMenu");
 
-        if (
-          honeypot &&
-          honeypot.value.trim() !== ""
-        ) {
+  const mobileLinks =
+    document.querySelectorAll(".mobile-link");
 
-          return;
 
-        }
+  const closeMobileMenu = () => {
 
+    if (!mobileMenu || !mobileToggle) return;
 
-        /*
-         * Validation
-         */
+    mobileMenu.classList.remove("open");
 
-        const isNameValid =
-          checkField(
-            fullName,
-            fullName &&
-            fullName.value.trim().length >= 2
-          );
+    mobileToggle.setAttribute(
+      "aria-expanded",
+      "false"
+    );
 
+    mobileToggle.setAttribute(
+      "aria-label",
+      "Open navigation menu"
+    );
 
-        const isBusinessValid =
-          checkField(
-            businessName,
-            businessName &&
-            businessName.value.trim().length >= 2
-          );
+    mobileMenu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
 
+    document.body.classList.remove("menu-open");
 
-        const isEmailValid =
-          checkField(
-            email,
-            email &&
-            validateEmail(
-              email.value.trim()
-            )
-          );
+  };
 
 
-        const isPhoneValid =
-          checkField(
-            phone,
-            phone &&
-            phone.value.trim().length >= 5
-          );
+  const openMobileMenu = () => {
 
+    if (!mobileMenu || !mobileToggle) return;
 
-        const isBusinessTypeValid =
-          checkField(
-            businessType,
-            businessType &&
-            businessType.value !== ""
-          );
+    mobileMenu.classList.add("open");
 
+    mobileToggle.setAttribute(
+      "aria-expanded",
+      "true"
+    );
 
-        const isServiceValid =
-          checkField(
-            service,
-            service &&
-            service.value !== ""
-          );
+    mobileToggle.setAttribute(
+      "aria-label",
+      "Close navigation menu"
+    );
 
+    mobileMenu.setAttribute(
+      "aria-hidden",
+      "false"
+    );
 
-        const isMessageValid =
-          checkField(
-            message,
-            message &&
-            message.value.trim().length >= 10
-          );
+    document.body.classList.add("menu-open");
 
+  };
 
-        const isValid =
-          isNameValid &&
-          isBusinessValid &&
-          isEmailValid &&
-          isPhoneValid &&
-          isBusinessTypeValid &&
-          isServiceValid &&
-          isMessageValid;
 
+  if (mobileToggle) {
 
-        if (!isValid) {
+    mobileToggle.addEventListener(
+      "click",
+      () => {
 
-          const firstError =
-            contactForm.querySelector(
-              ".has-error .form-input, .has-error .form-select, .has-error .form-textarea"
-            );
-
-          if (firstError) {
-            firstError.focus();
-          }
-
-          return;
-
-        }
-
-
-        /*
-         * Form endpoint
-         */
-
-        const endpoint =
-          contactForm.getAttribute("action") ||
-          NEXORA_CONFIG.formEndpoint;
-
-
-        if (
-          !endpoint ||
-          endpoint.includes("YOUR_FORM_ID")
-        ) {
-
-          if (formError) {
-
-            formError.textContent =
-              "The enquiry form is not configured yet. Please contact Nexora through WhatsApp or email.";
-
-            formError.hidden = false;
-
-          }
-
-          return;
-
-        }
-
-
-        /*
-         * Loading state
-         */
-
-        if (submitBtn) {
-
-          submitBtn.classList.add(
-            "loading"
-          );
-
-          submitBtn.disabled = true;
-
-        }
-
-
-        const buttonText =
-          submitBtn
-            ? submitBtn.querySelector(".btn-text")
-            : null;
-
-
-        if (buttonText) {
-          buttonText.textContent =
-            "Sending...";
-        }
-
-
-        try {
-
-          const formData =
-            new FormData(contactForm);
-
-
-          const response =
-            await fetch(
-              endpoint,
-              {
-                method: "POST",
-
-                body: formData,
-
-                headers: {
-                  Accept:
-                    "application/json"
-                }
-              }
-            );
-
-
-          if (response.ok) {
-
-            contactForm.reset();
-
-
-            /*
-             * Remove validation states
-             */
-
-            contactForm
-              .querySelectorAll(
-                ".has-error"
-              )
-              .forEach((group) => {
-
-                group.classList.remove(
-                  "has-error"
-                );
-
-              });
-
-
-            if (formSuccess) {
-
-              formSuccess.hidden =
-                false;
-
-              formSuccess.scrollIntoView({
-                behavior: "smooth",
-                block: "nearest"
-              });
-
-            }
-
-          } else {
-
-            let errorMessage =
-              "Submission failed. Please contact Nexora directly through WhatsApp or email.";
-
-
-            /*
-             * Try to read Formspree's
-             * JSON error response
-             */
-
-            try {
-
-              const data =
-                await response.json();
-
-              if (
-                data &&
-                Array.isArray(data.errors) &&
-                data.errors.length
-              ) {
-
-                errorMessage =
-                  data.errors
-                    .map(
-                      (error) =>
-                        error.message
-                    )
-                    .join(" ");
-
-              }
-
-            } catch (parseError) {
-              /*
-               * Keep default error message.
-               */
-            }
-
-
-            if (formError) {
-
-              formError.textContent =
-                errorMessage;
-
-              formError.hidden =
-                false;
-
-            }
-
-          }
-
-        } catch (error) {
-
-          if (formError) {
-
-            formError.textContent =
-              "Network error. Please try again or contact Nexora directly through WhatsApp.";
-
-            formError.hidden =
-              false;
-
-          }
-
-        } finally {
-
-          if (submitBtn) {
-
-            submitBtn.classList.remove(
-              "loading"
-            );
-
-            submitBtn.disabled =
-              false;
-
-          }
-
-
-          if (buttonText) {
-
-            buttonText.textContent =
-              "Send Project Enquiry";
-
-          }
-
+        const isOpen =
+          mobileMenu?.classList.contains("open");
+
+        if (isOpen) {
+          closeMobileMenu();
+        } else {
+          openMobileMenu();
         }
 
       }
@@ -816,29 +153,55 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  /* =========================================================
+  mobileLinks.forEach((link) => {
+
+    link.addEventListener(
+      "click",
+      closeMobileMenu
+    );
+
+  });
+
+
+  window.addEventListener(
+    "resize",
+    () => {
+
+      if (window.innerWidth > 900) {
+        closeMobileMenu();
+      }
+
+    }
+  );
+
+
+  /* =========================
+     ESCAPE KEY
+  ========================== */
+
+  document.addEventListener(
+    "keydown",
+    (event) => {
+
+      if (event.key === "Escape") {
+        closeMobileMenu();
+      }
+
+    }
+  );
+
+
+  /* =========================
      SCROLL REVEAL
-  ========================================================= */
+  ========================== */
 
   const revealElements =
-    document.querySelectorAll(
-      [
-        ".service-card",
-        ".project-card",
-        ".why-card",
-        ".pricing-card",
-        ".timeline-item",
-        ".tech-item",
-        ".faq-item",
-        ".contact-form-card",
-        ".about-text-col",
-        ".about-image-col"
-      ].join(", ")
-    );
+    document.querySelectorAll(".reveal");
 
 
   if (
-    "IntersectionObserver" in window
+    "IntersectionObserver" in window &&
+    revealElements.length
   ) {
 
     const revealObserver =
@@ -847,126 +210,598 @@ document.addEventListener("DOMContentLoaded", () => {
 
           entries.forEach((entry) => {
 
-            if (
-              !entry.isIntersecting
-            ) {
+            if (!entry.isIntersecting) return;
 
-              return;
+            entry.target.classList.add("active");
 
-            }
-
-
-            entry.target.classList.add(
-              "reveal",
-              "active"
-            );
-
-
-            observer.unobserve(
-              entry.target
-            );
+            observer.unobserve(entry.target);
 
           });
 
         },
         {
-          root: null,
-
-          rootMargin:
-            "0px 0px -40px 0px",
-
-          threshold: 0.08
+          threshold: 0.12,
+          rootMargin: "0px 0px -40px 0px"
         }
       );
 
 
     revealElements.forEach((element) => {
-
-      element.classList.add(
-        "reveal"
-      );
-
-      revealObserver.observe(
-        element
-      );
-
+      revealObserver.observe(element);
     });
 
   } else {
 
-    /*
-     * Fallback for browsers without
-     * IntersectionObserver.
-     */
+    revealElements.forEach((element) => {
+      element.classList.add("active");
+    });
 
-    revealElements.forEach(
-      (element) => {
+  }
 
-        element.classList.add(
-          "reveal",
-          "active"
+
+  /* =========================
+     ACTIVE NAVIGATION
+  ========================== */
+
+  const sections =
+    document.querySelectorAll(
+      "main section[id]"
+    );
+
+  const navLinks =
+    document.querySelectorAll(
+      ".nav-link"
+    );
+
+
+  if (
+    "IntersectionObserver" in window &&
+    sections.length &&
+    navLinks.length
+  ) {
+
+    const sectionObserver =
+      new IntersectionObserver(
+        (entries) => {
+
+          entries.forEach((entry) => {
+
+            if (!entry.isIntersecting) return;
+
+            const id =
+              entry.target.getAttribute("id");
+
+            navLinks.forEach((link) => {
+
+              link.classList.toggle(
+                "active",
+                link.getAttribute("href") === `#${id}`
+              );
+
+            });
+
+          });
+
+        },
+        {
+          threshold: 0.25,
+          rootMargin: "-20% 0px -65% 0px"
+        }
+      );
+
+
+    sections.forEach((section) => {
+      sectionObserver.observe(section);
+    });
+
+  }
+
+
+  /* =========================
+     FAQ ACCORDION
+  ========================== */
+
+  const faqQuestions =
+    document.querySelectorAll(
+      ".faq-question"
+    );
+
+
+  faqQuestions.forEach((question) => {
+
+    question.addEventListener(
+      "click",
+      () => {
+
+        const item =
+          question.closest(".faq-item");
+
+        if (!item) return;
+
+        const isOpen =
+          item.classList.contains("open");
+
+
+        document
+          .querySelectorAll(".faq-item.open")
+          .forEach((openItem) => {
+
+            if (openItem !== item) {
+
+              openItem.classList.remove("open");
+
+              const openButton =
+                openItem.querySelector(".faq-question");
+
+              if (openButton) {
+                openButton.setAttribute(
+                  "aria-expanded",
+                  "false"
+                );
+              }
+
+            }
+
+          });
+
+
+        item.classList.toggle(
+          "open",
+          !isOpen
+        );
+
+        question.setAttribute(
+          "aria-expanded",
+          String(!isOpen)
         );
 
       }
     );
 
-  }
+  });
 
 
-  /* =========================================================
-     HEADER SHADOW / BORDER ON SCROLL
-  ========================================================= */
+  /* =========================
+     IMAGE FALLBACKS
+  ========================== */
 
-  const header =
-    document.getElementById("header");
+  document
+    .querySelectorAll(".project-img")
+    .forEach((image) => {
+
+      const fallback =
+        image
+          .closest(".project-media")
+          ?.querySelector(".media-fallback");
 
 
-  function updateHeader() {
+      const showFallback = () => {
 
-    if (!header) {
-      return;
+        image.style.display = "none";
+
+        if (fallback) {
+          fallback.hidden = false;
+        }
+
+      };
+
+
+      image.addEventListener(
+        "error",
+        showFallback
+      );
+
+
+      /*
+       * Handles cached/failed images.
+       */
+
+      if (
+        image.complete &&
+        image.naturalWidth === 0
+      ) {
+        showFallback();
+      }
+
+    });
+
+
+  /* =========================
+     STUDIO IMAGE FALLBACK
+  ========================== */
+
+  document
+    .querySelectorAll(".studio-img")
+    .forEach((image) => {
+
+      const fallback =
+        image
+          .closest(".studio-placeholder")
+          ?.querySelector(".studio-fallback");
+
+
+      const showFallback = () => {
+
+        image.style.display = "none";
+
+        if (fallback) {
+          fallback.hidden = false;
+        }
+
+      };
+
+
+      image.addEventListener(
+        "error",
+        showFallback
+      );
+
+
+      if (
+        image.complete &&
+        image.naturalWidth === 0
+      ) {
+        showFallback();
+      }
+
+    });
+
+
+  /* =========================
+     FORM VALIDATION
+  ========================== */
+
+  const form =
+    document.getElementById("contactForm");
+
+  const submitButton =
+    document.getElementById("submitBtn");
+
+  const successMessage =
+    document.getElementById("formSuccess");
+
+  const errorMessage =
+    document.getElementById("formError");
+
+
+  if (!form) return;
+
+
+  const getFieldGroup = (field) =>
+    field.closest(".form-group");
+
+
+  const setInvalid = (
+    field,
+    invalid = true
+  ) => {
+
+    const group =
+      getFieldGroup(field);
+
+    if (!group) return;
+
+    group.classList.toggle(
+      "invalid",
+      invalid
+    );
+
+  };
+
+
+  const validateField = (field) => {
+
+    if (!field) return true;
+
+
+    const value =
+      field.value.trim();
+
+
+    if (
+      field.required &&
+      !value
+    ) {
+
+      setInvalid(field, true);
+
+      return false;
+
     }
 
-    if (window.scrollY > 10) {
 
-      header.style.borderBottomColor =
-        "rgba(255, 255, 255, 0.12)";
+    if (
+      field.type === "email" &&
+      value
+    ) {
 
-    } else {
+      const emailRegex =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      header.style.borderBottomColor =
-        "rgba(255, 255, 255, 0.08)";
+
+      if (!emailRegex.test(value)) {
+
+        setInvalid(field, true);
+
+        return false;
+
+      }
 
     }
 
-  }
+
+    if (
+      field.minLength > 0 &&
+      value.length < field.minLength
+    ) {
+
+      setInvalid(field, true);
+
+      return false;
+
+    }
 
 
-  window.addEventListener(
-    "scroll",
-    updateHeader,
-    { passive: true }
+    setInvalid(field, false);
+
+    return true;
+
+  };
+
+
+  const fields =
+    form.querySelectorAll(
+      "input:not([type='hidden']):not([type='text'][name='_gotcha']), select, textarea"
+    );
+
+
+  fields.forEach((field) => {
+
+    field.addEventListener(
+      "blur",
+      () => validateField(field)
+    );
+
+
+    field.addEventListener(
+      "input",
+      () => {
+
+        if (
+          getFieldGroup(field)?.classList.contains(
+            "invalid"
+          )
+        ) {
+          validateField(field);
+        }
+
+      }
+    );
+
+
+    field.addEventListener(
+      "change",
+      () => validateField(field)
+    );
+
+  });
+
+
+  /* =========================
+     FORM SUBMISSION
+  ========================== */
+
+  form.addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+
+      if (successMessage) {
+        successMessage.hidden = true;
+      }
+
+      if (errorMessage) {
+        errorMessage.hidden = true;
+      }
+
+
+      /*
+       * Honeypot protection.
+       */
+
+      const honeypot =
+        document.getElementById(
+          "company_website"
+        );
+
+
+      if (
+        honeypot &&
+        honeypot.value.trim() !== ""
+      ) {
+        return;
+      }
+
+
+      let formIsValid = true;
+
+
+      fields.forEach((field) => {
+
+        if (!validateField(field)) {
+          formIsValid = false;
+        }
+
+      });
+
+
+      if (!formIsValid) {
+
+        const firstInvalid =
+          form.querySelector(
+            ".form-group.invalid .form-input, .form-group.invalid .form-select, .form-group.invalid .form-textarea"
+          );
+
+
+        if (firstInvalid) {
+          firstInvalid.focus();
+        }
+
+        return;
+
+      }
+
+
+      if (submitButton) {
+
+        submitButton.disabled = true;
+
+        submitButton.classList.add(
+          "is-loading"
+        );
+
+      }
+
+
+      try {
+
+        const formData =
+          new FormData(form);
+
+
+        const response =
+          await fetch(
+            form.action,
+            {
+              method: "POST",
+              body: formData,
+              headers: {
+                Accept: "application/json"
+              }
+            }
+          );
+
+
+        if (!response.ok) {
+          throw new Error(
+            "Form submission failed."
+          );
+        }
+
+
+        form.reset();
+
+
+        form.querySelectorAll(
+          ".form-group.invalid"
+        ).forEach((group) => {
+          group.classList.remove("invalid");
+        });
+
+
+        if (successMessage) {
+          successMessage.hidden = false;
+        }
+
+
+        if (errorMessage) {
+          errorMessage.hidden = true;
+        }
+
+
+        successMessage?.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest"
+        });
+
+
+      } catch (error) {
+
+        if (successMessage) {
+          successMessage.hidden = true;
+        }
+
+        if (errorMessage) {
+          errorMessage.hidden = false;
+        }
+
+      } finally {
+
+        if (submitButton) {
+
+          submitButton.disabled = false;
+
+          submitButton.classList.remove(
+            "is-loading"
+          );
+
+        }
+
+      }
+
+    }
   );
 
 
-  updateHeader();
+  /* =========================
+     CURRENT YEAR
+  ========================== */
 
-});
+  const year =
+    document.getElementById(
+      "current-year"
+    );
 
-/* =========================
-   IMAGE FALLBACKS
-   ========================= */
 
-document.querySelectorAll('.project-img').forEach((img) => {
-  img.addEventListener('error', () => {
-    img.style.display = 'none';
+  if (year) {
+    year.textContent =
+      new Date().getFullYear();
+  }
 
-    const fallback = img
-      .closest('.project-media')
-      ?.querySelector('.media-fallback');
 
-    if (fallback) {
-      fallback.hidden = false;
-    }
-  });
+  /* =========================
+     SMOOTH ANCHOR FALLBACK
+  ========================== */
+
+  document
+    .querySelectorAll('a[href^="#"]')
+    .forEach((link) => {
+
+      link.addEventListener(
+        "click",
+        (event) => {
+
+          const targetId =
+            link.getAttribute("href");
+
+          if (
+            !targetId ||
+            targetId === "#"
+          ) {
+            return;
+          }
+
+
+          const target =
+            document.querySelector(targetId);
+
+
+          if (!target) return;
+
+
+          event.preventDefault();
+
+
+          target.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+
+        }
+      );
+
+    });
+
 });
